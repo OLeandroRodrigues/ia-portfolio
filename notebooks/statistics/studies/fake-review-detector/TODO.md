@@ -4,7 +4,7 @@
  	to assess whether some of these reviews are being posted by the same individuals or by a bot
 	
 ## Data Collection
-  - [ ] Read the URL below and store all the comments in a text file named 'ofner-reviews', separating each comment with a pipe (|).
+  - [ ] Read the URL below and store all the comments in a text file named 'ofner-reviews', separating each comment with a pipe (|). And then store this file inside the repository in the following folder ..\fake-review-detector\data
 
 
 URL: Coffee Shop
