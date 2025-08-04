@@ -1,6 +1,7 @@
 # TODO
-## Goals
-	1. The goal is to read public Google reviews for a well-known coffee shop in São Paulo city and apply cognitive modeling to assess whether some of these reviews are being posted by the same individuals or by a bot
+## Goal
+	The goal is to read public Google reviews for a well-known coffee shop in São Paulo city and apply cognitive modeling 
+ 	to assess whether some of these reviews are being posted by the same individuals or by a bot
 	
 ## Data Collection
   - [ ] Read the URL below and store all the comments in a text file named 'ofner-reviews', separating each comment with a pipe (|).
