@@ -56,8 +56,8 @@ class GoogleCommentScraper:
     
     def _click_more_in_view(self):
         """
-        Clica em todos os links 'Mais' visíveis nesta tela.
-        DOM típico: <a class="MtCSLb" role="button" aria-label="Ler mais ...">Mais</a>
+        Click in all the links 'Mais' visibles in this page.
+        DOM : <a class="MtCSLb" role="button" aria-label="Ler mais ...">Mais</a>
         """
         xpaths = [
             "//div[contains(@class,'OA1nbd')]//a[contains(@class,'MtCSLb') and @role='button']",
@@ -70,7 +70,7 @@ class GoogleCommentScraper:
             for b in btns:
                 try:
                     if b.is_displayed():
-                        # Centers and clicks via JS (evita intercept/overlay)
+                        # Centers and clicks via JS (avoid intercept/overlay)
                         self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", b)
                         self.driver.execute_script("arguments[0].click();", b)
                         clicked += 1
