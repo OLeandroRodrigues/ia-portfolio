@@ -4,8 +4,8 @@
  	to assess whether some of these reviews are being posted by the same individuals or by a bot
 	
 ## Data Collection
-  - [x] Read the URL below and store all the comments in a text file named 'ofner-reviews', separating each comment with a pipe (|). And then store this file inside the repository in the following folder ..\fake-review-detector\data
-  - [ ] Clean the data and create a text file named 'clean-ofner-reviews' with the following format: name|rating|number of photos|message. And then store this file inside the repository in the following folder ..\fake-review-detector\data
+  - [x] Read the URL below and store all the comments in a text file named 'dirty-data-google-reviews', separating each comment with a pipe (|). And then store this file inside the repository in the following folder ..\fake-review-detector\data
+  - [x] Clean the data and create a text file named 'clean-data-google-reviews' with the following format: name|rating|number of photos|message. And then store this file inside the repository in the following folder ..\fake-review-detector\data
 
 
 URL: Coffee Shop
