@@ -1,4 +1,4 @@
-# google_scraper/comment_scraper.py
+# google_scraper/review_scraper.py
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -14,8 +14,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 import os
 import time
 
-class GoogleCommentScraper:
-    def __init__(self, url, output_file_name="dirty-data-google-comments.txt", max_comments=100, scroll_delay=1):
+class GoogleReviewsScraper:
+    def __init__(self, url, output_file_name="dirty-data-google-reviews.txt", max_comments=1600, scroll_delay=2):
         self.url = url
         self.output_file_name = output_file_name
         self.max_comments = max_comments
@@ -56,8 +56,8 @@ class GoogleCommentScraper:
     
     def _click_more_in_view(self):
         """
-        Clica em todos os links 'Mais' visíveis nesta tela.
-        DOM típico: <a class="MtCSLb" role="button" aria-label="Ler mais ...">Mais</a>
+        Click in all the links 'Mais' visibles in this page.
+        DOM : <a class="MtCSLb" role="button" aria-label="Ler mais ...">Mais</a>
         """
         xpaths = [
             "//div[contains(@class,'OA1nbd')]//a[contains(@class,'MtCSLb') and @role='button']",
@@ -70,7 +70,7 @@ class GoogleCommentScraper:
             for b in btns:
                 try:
                     if b.is_displayed():
-                        # Centers and clicks via JS (evita intercept/overlay)
+                        # Centers and clicks via JS (avoid intercept/overlay)
                         self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", b)
                         self.driver.execute_script("arguments[0].click();", b)
                         clicked += 1
