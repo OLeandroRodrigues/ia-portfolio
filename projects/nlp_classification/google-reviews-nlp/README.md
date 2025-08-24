@@ -163,33 +163,25 @@ Python 3.10+
 pip (virtual environment recommended)
 
 ⚙️ Setup & Install
-# from the repository root
+
+**from the repository root**
+
 python -m venv .venv
-
-
 Activate the venv
-
 🪟 Windows
-
 .venv\Scripts\activate
 
-
 🍎 macOS / 🐧 Linux
-
 source .venv/bin/activate
 
-
 Install deps
-
 pip install -r requirements.txt
 
-
-▶️ Run the Tests
-# run the whole suite
+**▶️ Run the Tests**
+#run the whole suite
 python -m pytest -q
 
-
-🛠️ Troubleshooting
+**🛠️ Troubleshooting**
 
 🐍 ModuleNotFoundError: No module named 'src'
 
