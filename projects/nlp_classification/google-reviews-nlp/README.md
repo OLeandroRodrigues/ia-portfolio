@@ -25,6 +25,43 @@ The project is organized into **two layers**:
 - ✅ Provide explainable outputs for research and audit.
 
 ---
+### 🚀 Project Pipeline
+
+1. **Preprocessing (DONE)**
+
+-  Implemented in src/data/preprocess.py to clean and normalize raw comments.
+-  Output: data/processed/data-google-reviews_clean.csv
+-  Area: NLP (text cleaning & normalization)
+
+2. **Embedding Extraction (WORK IN PROGRESS)**
+
+-  Implemented in src/features/embeddings.py (e.g., using TF-Hub multilingual USE).
+-  Output: artifacts/features/embeddings.npy
+-  Area: NLP / Representation Learning (vectorization of text)
+
+3. **Classifier Training (TO DO)**
+
+-  Implemented in src/models/classifier.py to train a sentiment/spam detection model.
+-  Output: artifacts/models/
+-  Area: NLP + Machine Learning / Neural Networks
+
+4. **Author Linking (TO DO)**
+
+-  Implemented in src/linking/similarity.py + src/linking/clustering.py to cluster possible repeated authors.
+-  Output: artifacts/predictions/author_clusters.csv
+-  Area: NLP + Unsupervised Learning (clustering)
+
+5. **Evaluation (TO DO)**
+
+-  Implemented in src/eval/ for classification and linking metrics.
+-  Area: General Machine Learning (evaluation metrics)
+
+6. **Automated Tests (DONE)**
+
+-  Unit tests located in tests/ for each module.
+-  Area: Software Engineering / Best Practices
+
+---
 
 ## 📂 Project Structure
 
