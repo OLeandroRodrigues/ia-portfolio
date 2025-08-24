@@ -73,6 +73,9 @@ google-reviews-nlp/
 │       └── siamese_tf.py
 │
 └── tests/                    # unit tests
+    ├── src
+         ├── data
+             └── test_preprocess.py
 ```
 
 ---
@@ -109,6 +112,53 @@ google-reviews-nlp/
 - 🤖 **Saved TensorFlow models** (`.h5`, `.pkl`)
 - 🔗 **Similarity graphs** of comments
 - 👥 **Author cluster assignments** (`author_clusters.csv`)
+
+---
+
+## 🧪 Running the Unit Tests
+
+Follow the steps below to execute the test suite for src/data/preprocess.py.
+
+📦 Prerequisites
+
+Python 3.10+
+
+pip (virtual environment recommended)
+
+⚙️ Setup & Install
+# from the repository root
+python -m venv .venv
+
+
+Activate the venv
+
+🪟 Windows
+
+.venv\Scripts\activate
+
+
+🍎 macOS / 🐧 Linux
+
+source .venv/bin/activate
+
+
+Install deps
+
+pip install -r requirements.txt
+
+
+▶️ Run the Tests
+# run the whole suite
+python -m pytest -q
+
+
+🛠️ Troubleshooting
+
+🐍 ModuleNotFoundError: No module named 'src'
+
+Make sure you run from the repo root and use the module form:
+
+python -m pytest -q
 
 ---
 
