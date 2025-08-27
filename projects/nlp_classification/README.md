@@ -8,6 +8,8 @@ It contains different sub-repositories and experiments on text preprocessing, fe
 ## 📂 Repository Structure
 
 Each folder inside this repository corresponds to a **standalone project** (sometimes mirrored from its own GitHub repo):
+
+```
 nlp_classification/
 ├── google-reviews-nlp/ # Subproject: reviews classification
 
