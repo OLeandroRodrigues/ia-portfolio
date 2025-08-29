@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "google-reviews"
+version = "0.1.0"
+description = "Scraper + parser for Google Reviews, exporting clean CSV datasets"
+readme = "README.md"
+requires-python = ">=3.10"
+
+# Main runtime dependencies
+dependencies = [
+  "pandas>=2.0",
+  "selenium>=4.18.1"  # modern Selenium with Selenium Manager support
+  # If you want webdriver-manager as fallback, uncomment below:
+  # "webdriver-manager>=4.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+google-reviews = "google_reviews.cli:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest",       # unit testing
+  "pytest-cov",   # coverage reports (optional, nice-to-have)
+  "black",        # code formatting
+  "ruff"          # linting
+]
