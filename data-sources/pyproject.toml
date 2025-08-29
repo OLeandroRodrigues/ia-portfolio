@@ -25,7 +25,8 @@ google-reviews = "google_reviews.cli:main"
 
 [project.optional-dependencies]
 dev = [
-  "pytest",   # for testing
-  "black",    # for code formatting
-  "ruff"      # for linting
+  "pytest",       # unit testing
+  "pytest-cov",   # coverage reports (optional, nice-to-have)
+  "black",        # code formatting
+  "ruff"          # linting
 ]

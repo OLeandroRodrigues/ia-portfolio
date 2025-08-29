@@ -11,18 +11,20 @@ Each folder inside this repository corresponds to a **standalone project** (some
 
 ```
 nlp_classification/
-├── google-reviews-nlp/ # Subproject: reviews classification
+├── 
 
+```
 ## 🚀 How to Use
 
 1. Clone this repository:
    ```bash
    git clone https://github.com/OLeandroRodrigues/ia-portfolio.git
    cd projects/nlp_classification
-Navigate into the desired subproject:
+   Navigate into the desired subproject:
 
-bash
-Copiar
-Editar
-cd google-reviews-nlp
-Follow the README.md inside each subproject for setup and usage instructions.
+   bash
+   Copiar
+   Editar
+   cd google-reviews-nlp
+   Follow the README.md inside each subproject for setup and usage instructions.
+   ```

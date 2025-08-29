@@ -91,7 +91,6 @@ class GoogleReviewsScraper:
         return webdriver.Chrome(service=Service(), options=options)
         # Alternatively: return webdriver.Chrome(options=options)
 
-    
 
     def close(self) -> None:
         """Quit the driver if it was created by this instance."""
