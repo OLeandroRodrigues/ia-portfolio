@@ -97,25 +97,25 @@ That’s why we later **train an NLP classifier**: to make the model understand 
 This project builds a sentiment classifier (positive / neutral / negative) for Google Reviews.
 The workflow has 4 main steps:
 
-1️⃣ Generate Labels (Heuristic)
+1️⃣ **Generate Labels (Heuristic)**
 
 Create reviews_labeled.csv from the raw dataset using the labeling script:
 
-# Linux / macOS
+**Linux / macOS**
 ```bash
 python -m src.data.heuristics_labeling \
   --in "data/raw/data-google-reviews.csv" \
   --out "data/processed/reviews_labeled.csv"
 ```
 
-# Windows PowerShell
+** Windows PowerShell **
 ``` powershell
 python -m src.data.heuristics_labeling --in "data/raw/data-google-reviews.csv" --out "data/processed/reviews_labeled.csv"
 ```
 
 ➡️ Output: data/processed/reviews_labeled.csv with column label.
 
-2️⃣ Train the TensorFlow Model
+2️⃣ **Train the TensorFlow Model**
 
 ```bash
 python -m src.models.classifier_tf
@@ -124,7 +124,7 @@ python -m src.models.classifier_tf
 Model → artifacts/models/keras/model_full/
 Metrics → artifacts/models/keras/train_metrics.json
 
-3️⃣ Inference (Use the Trained Model)
+3️⃣ **Inference (Use the Trained Model)**
 
 ``` python
 from src.models.classifier_tf import SentimentClassifierTF
@@ -141,7 +141,7 @@ print(preds)  # ['positive', 'neutral', 'negative']
 
 ```
 
-4️⃣ Evaluation (Accuracy, F1, Confusion Matrix)
+4️⃣ **Evaluation (Accuracy, F1, Confusion Matrix)**
 
 ``` python
 from pathlib import Path
