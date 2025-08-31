@@ -25,6 +25,35 @@ The project is organized into **two layers**:
 - ✅ Provide explainable outputs for research and audit.
 
 ---
+
+## 🏷️ Labeling Strategy (heuristics)
+
+The file [`reviews_labeled.csv`](data/processed/reviews_labeled.csv) is generated automatically by the script [`src/data/heuristics_labeling.py`](src/data/heuristics_labeling.py).  
+
+The labeling is based **only on ratings (stars)** and simple patterns inside the review message.  
+No natural language understanding is applied at this stage.
+
+**Rules:**
+
+- If the row had a numeric `rating`:
+  - `≥ 4.0` → **positive**  
+  - `≤ 2.0` → **negative**  
+  - `2.1 – 3.9` → **neutral**
+
+- If the row had no `rating`, but the `message` contained explicit patterns like `x/5` (e.g. *“Comida: 1/5, Serviço: 4/5, Ambiente: 5/5”*):  
+  - All values are collected  
+  - The **median** is calculated  
+  - Converted to **positive / neutral / negative** with the same rules above
+
+- If the row had neither `rating` nor `x/5` patterns in the `message`:  
+  - `label = None`  
+  - The row is discarded in the final output  
+
+⚠️ **Important:** at this stage the **free text message is not used** (e.g., *“o atendimento foi horrível”*, *“doces maravilhosos”*).  
+That’s why we later **train an NLP classifier**: to make the model understand the sentiment from text alone, even without ratings.
+
+--- 
+
 ### 🚀 Project Pipeline
 
 1. **Preprocessing (DONE)**
@@ -60,6 +89,83 @@ The project is organized into **two layers**:
 
 -  Unit tests located in tests/ for each module.
 -  Area: Software Engineering / Best Practices
+
+---
+
+## 📌 End-to-end Sentiment Analysis Pipeline
+
+This project builds a sentiment classifier (positive / neutral / negative) for Google Reviews.
+The workflow has 4 main steps:
+
+1️⃣ **Generate Labels (Heuristic)**
+
+Create reviews_labeled.csv from the raw dataset using the labeling script:
+
+**Linux / macOS**
+```bash
+python -m src.data.heuristics_labeling \
+  --in "data/raw/data-google-reviews.csv" \
+  --out "data/processed/reviews_labeled.csv"
+```
+
+** Windows PowerShell **
+``` powershell
+python -m src.data.heuristics_labeling --in "data/raw/data-google-reviews.csv" --out "data/processed/reviews_labeled.csv"
+```
+
+➡️ Output: data/processed/reviews_labeled.csv with column label.
+
+2️⃣ **Train the TensorFlow Model**
+
+```bash
+python -m src.models.classifier_tf
+```
+✔️ Output:
+Model → artifacts/models/keras/model_full/
+Metrics → artifacts/models/keras/train_metrics.json
+
+3️⃣ **Inference (Use the Trained Model)**
+
+``` python
+from src.models.classifier_tf import SentimentClassifierTF
+
+clf = SentimentClassifierTF("artifacts/models/keras/model_full")
+clf.load()
+
+preds = clf.predict([
+    "Excelente atendimento e doces incríveis!",
+    "Preço razoável, nada demais.",
+    "Demorou muito e veio errado."
+])
+print(preds)  # ['positive', 'neutral', 'negative']
+
+```
+
+4️⃣ **Evaluation (Accuracy, F1, Confusion Matrix)**
+
+``` python
+from pathlib import Path
+import pandas as pd
+from src.models.classifier_tf import SentimentClassifierTF
+from src.eval.metrics_classification import compute_metrics, save_metrics
+
+df = pd.read_csv("data/processed/reviews_labeled.csv")
+texts, y_true = df["message"], df["label"]
+
+clf = SentimentClassifierTF("artifacts/models/keras/model_full")
+clf.load()
+y_pred = clf.predict(texts)
+
+m = compute_metrics(y_true, y_pred)
+save_metrics(m, Path("artifacts/predictions"), "keras_fullset")
+
+print("accuracy:", m["accuracy"])
+
+```
+
+✔️ Output:
+artifacts/predictions/keras_fullset_metrics.json
+artifacts/predictions/keras_fullset_confusion_matrix.csv
 
 ---
 
@@ -157,37 +263,42 @@ google-reviews-nlp/
 Follow the steps below to execute the test suite for src/data/preprocess.py.
 
 📦 Prerequisites
-
 Python 3.10+
-
 pip (virtual environment recommended)
-
 ⚙️ Setup & Install
 
 **from the repository root**
-
+``` bash
 python -m venv .venv
 Activate the venv
+```
+
 🪟 Windows
+``` powershell
 .venv\Scripts\activate
+```
 
 🍎 macOS / 🐧 Linux
+``` bash
 source .venv/bin/activate
 
 Install deps
 pip install -r requirements.txt
+```
 
 **▶️ Run the Tests**
 #run the whole suite
+``` bash
 python -m pytest -q
+```
 
 **🛠️ Troubleshooting**
 
 🐍 ModuleNotFoundError: No module named 'src'
-
 Make sure you run from the repo root and use the module form:
-
+``` bash
 python -m pytest -q
+```
 
 ---
 

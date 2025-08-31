@@ -67,6 +67,6 @@ def run(input_csv: str, output_csv: str) -> None:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", default="data/raw/data-google-reviews.csv")
-    ap.add_argument("--output", default="data/processed/data-google-reviews_clean.csv")
+    ap.add_argument("--output", default="data/processed/data-google-reviews-clean.csv")
     args = ap.parse_args()
     run(args.input, args.output)
