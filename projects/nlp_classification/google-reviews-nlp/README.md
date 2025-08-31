@@ -102,31 +102,31 @@ The workflow has 4 main steps:
 Create reviews_labeled.csv from the raw dataset using the labeling script:
 
 # Linux / macOS
-´´´bash
+```bash
 python -m src.data.heuristics_labeling \
   --in "data/raw/data-google-reviews.csv" \
   --out "data/processed/reviews_labeled.csv"
-´´´
+```
 
 # Windows PowerShell
-´´´ powershell
+``` powershell
 python -m src.data.heuristics_labeling --in "data/raw/data-google-reviews.csv" --out "data/processed/reviews_labeled.csv"
-´´´
+```
 
 ➡️ Output: data/processed/reviews_labeled.csv with column label.
 
 2️⃣ Train the TensorFlow Model
 
-´´´bash
+```bash
 python -m src.models.classifier_tf
-´´´
+```
 ✔️ Output:
 Model → artifacts/models/keras/model_full/
 Metrics → artifacts/models/keras/train_metrics.json
 
 3️⃣ Inference (Use the Trained Model)
 
-´´´ python
+``` python
 from src.models.classifier_tf import SentimentClassifierTF
 
 clf = SentimentClassifierTF("artifacts/models/keras/model_full")
@@ -139,11 +139,11 @@ preds = clf.predict([
 ])
 print(preds)  # ['positive', 'neutral', 'negative']
 
-´´´
+```
 
 4️⃣ Evaluation (Accuracy, F1, Confusion Matrix)
 
-´´´ python
+``` python
 from pathlib import Path
 import pandas as pd
 from src.models.classifier_tf import SentimentClassifierTF
@@ -161,7 +161,7 @@ save_metrics(m, Path("artifacts/predictions"), "keras_fullset")
 
 print("accuracy:", m["accuracy"])
 
-´´´
+```
 
 ✔️ Output:
 artifacts/predictions/keras_fullset_metrics.json
@@ -263,37 +263,42 @@ google-reviews-nlp/
 Follow the steps below to execute the test suite for src/data/preprocess.py.
 
 📦 Prerequisites
-
 Python 3.10+
-
 pip (virtual environment recommended)
-
 ⚙️ Setup & Install
 
 **from the repository root**
-
+``` bash
 python -m venv .venv
 Activate the venv
+```
+
 🪟 Windows
+``` powershell
 .venv\Scripts\activate
+```
 
 🍎 macOS / 🐧 Linux
+``` bash
 source .venv/bin/activate
 
 Install deps
 pip install -r requirements.txt
+```
 
 **▶️ Run the Tests**
 #run the whole suite
+``` bash
 python -m pytest -q
+```
 
 **🛠️ Troubleshooting**
 
 🐍 ModuleNotFoundError: No module named 'src'
-
 Make sure you run from the repo root and use the module form:
-
+``` bash
 python -m pytest -q
+```
 
 ---
 
