@@ -1,57 +1,74 @@
+# src/data/heuristics_labeling.py
 from __future__ import annotations
 
 import argparse
 import re
+import sys
 from pathlib import Path
 from typing import List, Optional
 
 import pandas as pd
 
+# Reconfigure stdout/stderr to UTF-8 (helps on Windows consoles)
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
 
-RATING_PAT = re.compile(r"(\d+(?:[.,]\d+)?)\s*/\s*5")  # matches 4,7/5 | 4.7/5 | 3/5
+# Regex to remove emojis and various pictographic symbols
+# Covers: emoticons, pictographs, transport, flags, dingbats, variation selectors, skin tones, etc.
+EMOJI_PAT = re.compile(
+    "["                     # start char class
+    "\U0001F300-\U0001F5FF"  # symbols & pictographs
+    "\U0001F600-\U0001F64F"  # emoticons
+    "\U0001F680-\U0001F6FF"  # transport & map
+    "\U0001F700-\U0001F77F"  # alchemical
+    "\U0001F780-\U0001F7FF"  # geometric ext
+    "\U0001F800-\U0001F8FF"  # supplemental arrows
+    "\U0001F900-\U0001F9FF"  # supplemental symbols & pictographs
+    "\U0001FA00-\U0001FA6F"  # chess, symbols
+    "\U0001FA70-\U0001FAFF"  # emoji ext-A
+    "\U00002700-\U000027BF"  # dingbats (includes ❤ etc.)
+    "\U00002600-\U000026FF"  # misc symbols (☕ etc.)
+    "\U00002B00-\U00002BFF"  # arrows etc.
+    "\U0000FE0F"             # variation selector-16
+    "\U0001F1E6-\U0001F1FF"  # flags
+    "]",
+    flags=re.UNICODE,
+)
 
+RATING_IN_MSG_PAT = re.compile(r"(\d+(?:[.,]\d+)?)\s*/\s*5", re.IGNORECASE)
+
+# ---------- rating helpers ----------
 
 def parse_rating_cell(raw: str | float | int | None) -> Optional[float]:
-    """Parse rating from the 'rating' column. Accept forms like '4.7/5', '4,7/5', '4.7', '3', '-3'.
-    Negative values are clamped to 0.0; values above 5 may be rescaled/clamped.
-    """
+    """Parse rating from 'rating' column. Accepts '4.7/5', '4,7/5', '4.7', '3'."""
     if raw is None or (isinstance(raw, float) and pd.isna(raw)):
         return None
-
     s = str(raw).strip()
     if not s:
         return None
-
-    # Allow optional sign so that '-3' is captured as '-3' (not '3')
-    m = re.search(r"([+-]?\d+(?:[.,]\d+)?)\s*(?:/\s*5)?", s)
+    m = re.search(r"(\d+(?:[.,]\d+)?)\s*(?:/\s*5)?", s)
     if not m:
         return None
-
-    try:
-        val = float(m.group(1).replace(",", "."))
-    except ValueError:
-        return None
-
-    # Guard against 0–100 scales accidentally
+    val = float(m.group(1).replace(",", "."))
+    # guard for accidental 0-100 scales
     if val > 5.0:
         if val <= 100:
-            val = val / 20.0  # rough clamp (100 -> 5.0)
+            val = val / 20.0
         else:
             val = 5.0
-
-    # Clamp negatives
     if val < 0:
         val = 0.0
-
     return val
 
 
 def find_ratings_in_message(msg: str) -> List[float]:
-    """Find all x/5 patterns inside message and return as floats."""
+    """Find all x/5 patterns in the message text and return as floats."""
     if not isinstance(msg, str) or not msg:
         return []
     vals = []
-    for m in RATING_PAT.finditer(msg):
+    for m in RATING_IN_MSG_PAT.finditer(msg):
         v = float(m.group(1).replace(",", "."))
         if 0.0 <= v <= 5.0:
             vals.append(v)
@@ -59,8 +76,8 @@ def find_ratings_in_message(msg: str) -> List[float]:
 
 
 def rating_to_label(v: Optional[float]) -> Optional[str]:
-    """Map numeric rating to sentiment label. NaN/None -> None."""
-    if v is None or pd.isna(v):
+    """Map numeric rating to sentiment label."""
+    if v is None:
         return None
     if v >= 4.0:
         return "positive"
@@ -69,26 +86,28 @@ def rating_to_label(v: Optional[float]) -> Optional[str]:
     return "neutral"
 
 
-def clean_message(text: str) -> str:
-    """Light cleanup for the message column while preserving main content.
+# ---------- cleaning ----------
 
-    Steps:
-    1) Remove URLs first (so slash normalization won't break them).
-    2) Normalize slashes " / " to a single spaced separator.
-    3) Drop trailing 'Comida/Serviço/Ambiente' block (optional).
-    4) Collapse whitespace and trim.
-    """
+def remove_emojis(text: str) -> str:
+    if not isinstance(text, str):
+        return ""
+    return EMOJI_PAT.sub("", text)
+
+
+def clean_message(text: str, strip_emojis: bool = True) -> str:
+    """Light cleanup for message."""
     if pd.isna(text):
         return ""
     s = str(text)
 
-    # 1) Remove URLs first (http/https or www). Do this before slash normalization.
-    s = re.sub(r"(?:https?://|www\.)\S+", " ", s, flags=re.IGNORECASE)
+    # Optionally remove emojis and pictographs
+    if strip_emojis:
+        s = remove_emojis(s)
 
-    # 2) Normalize slashes " / " (now safe because URLs are gone)
+    # Normalize slashes and common UI artifacts
     s = re.sub(r"\s*/\s*", " / ", s)
 
-    # 3) Drop trailing 'Comida/Serviço/Ambiente' block
+    # Drop trailing 'Comida/Serviço/Ambiente' rating blocks (optional)
     s = re.sub(
         r"(Comida:\s*\d+(?:[.,]\d+)?\s*/\s*5.*)$",
         "",
@@ -96,14 +115,19 @@ def clean_message(text: str) -> str:
         flags=re.IGNORECASE,
     )
 
-    # 4) Collapse whitespace
+    # Remove URLs
+    s = re.sub(r"http\S+", " ", s)
+
+    # Collapse whitespace
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
 
+# ---------- IO ----------
+
 def robust_read_csv(path: str | Path) -> pd.DataFrame:
     """
-    Read pipe-delimited file with potential UTF-8 BOM, quotes, and long lines.
+    Read pipe-delimited file with possible BOM/quotes/long lines.
     Expect header: name|rating|number_of_photos|message
     """
     path = Path(path)
@@ -111,94 +135,69 @@ def robust_read_csv(path: str | Path) -> pd.DataFrame:
         raise FileNotFoundError(
             f"Input CSV not found: {path.resolve()}\n"
             "Tip: run from the repo root (google-reviews-nlp) or pass --in with an absolute path.\n"
-            "Expected structure: data/raw/clean-data-google-reviews.csv"
+            "Expected structure: data/raw/data-google-reviews.csv"
         )
-    # Use engine='python' for safety; encoding 'utf-8-sig' to drop BOM if present
     df = pd.read_csv(
         path,
         sep="|",
         engine="python",
         encoding="utf-8-sig",
-        dtype=str,           # keep raw forms; parse later
-        on_bad_lines="skip", # skip malformed lines instead of breaking
+        dtype=str,            # keep as string; parse later
+        on_bad_lines="skip",
     )
-    # Ensure expected columns
     for col in ["name", "rating", "number_of_photos", "message"]:
         if col not in df.columns:
             raise ValueError(f"Missing expected column: '{col}'. Found: {list(df.columns)}")
     return df
 
 
-def main(input_csv: str, output_csv: str):
-    """End-to-end pipeline:
-    - Read raw CSV
-    - Compute numeric ratings (column or fallback from raw message)
-    - Clean message
-    - Map to sentiment labels
-    - Filter unusable rows and save
-    """
+# ---------- main ----------
+
+def main(input_csv: str, output_csv: str, strip_emojis: bool = True):
     df = robust_read_csv(input_csv)
 
-    # Keep a copy of the raw message for fallback extraction BEFORE cleaning
-    raw_msg = df["message"]
+    # Clean message (with emoji removal by default)
+    df["message"] = df["message"].apply(lambda x: clean_message(x, strip_emojis=strip_emojis))
 
-    # 1) Base rating from the 'rating' column
+    # Parse rating from column, or fallback to message patterns
     base_rating = df["rating"].apply(parse_rating_cell)
 
-    # 2) Fallback: if base is None, try extracting from the *raw* message (not cleaned)
-    fallback_vals = []
-    for msg, rv in zip(raw_msg, base_rating):
+    final_vals: List[Optional[float]] = []
+    for msg, rv in zip(df["message"], base_rating):
         if rv is not None:
-            fallback_vals.append(rv)
-            continue
-        if not isinstance(msg, str) or not msg:
-            fallback_vals.append(None)
+            final_vals.append(rv)
             continue
         candidates = find_ratings_in_message(msg)
         if not candidates:
-            fallback_vals.append(None)
+            final_vals.append(None)
         else:
-            # If multiple (Comida/Serviço/Ambiente), take the median as a robust summary
-            fallback_vals.append(float(pd.Series(candidates).median()))
-    df["rating_num"] = fallback_vals
+            # median of multiple sub-ratings (Comida/Serviço/Ambiente)
+            final_vals.append(float(pd.Series(candidates).median()))
 
-    # 3) Clean message AFTER extracting fallback
-    df["message"] = raw_msg.apply(clean_message)
-
-    # 4) To label (ensure NaN/None returns None)
+    df["rating_num"] = final_vals
     df["label"] = df["rating_num"].apply(rating_to_label)
 
-    # 5) (Optional) drop rows with empty message or missing rating
-    #    Keep rows that have a valid rating_num AND:
-    #      - non-empty cleaned message; OR
-    #      - raw text contains any 'x/5' rating pattern (e.g., Comida/Serviço/Ambiente block),
-    #        which allows rows whose message became empty due to cleaning.
+    # Drop rows without message or label
     df["message_len"] = df["message"].str.len().fillna(0).astype(int)
-    valid_rating = df["rating_num"].notna()
-    non_empty_msg = df["message_len"] > 0
-
-    # Detect any x/5 pattern in the RAW message (covers 'Comida/Serviço/Ambiente' and similar)
-    raw_has_x_over_5 = raw_msg.fillna("").astype(str).str.contains(RATING_PAT)
-
-    keep_mask = valid_rating & (non_empty_msg | raw_has_x_over_5)
-
-    out = df[keep_mask].copy()
+    out = df[(df["message_len"] > 0) & df["label"].notna()].copy()
     out = out.drop(columns=["message_len"])
 
-    # 6) Save
     out_path = Path(output_csv)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(out_path, index=False)
+
+    # Print a small summary (safe for Windows due to reconfigure above)
     print(
         f"Saved labeled file to: {out_path.resolve()}\n"
-        f"Total rows in: {len(df)} | usable rows out: {len(out)} | "
-        f"label distribution:\n{out['label'].value_counts(dropna=False)}"
+        f"Total rows in: {len(df)} | usable rows out: {len(out)}\n"
+        f"Label distribution:\n{out['label'].value_counts(dropna=False)}"
     )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--in", dest="input_csv", default="data/raw/clean-data-google-reviews.csv")
+    parser.add_argument("--in", dest="input_csv", default="data/raw/data-google-reviews.csv")
     parser.add_argument("--out", dest="output_csv", default="data/processed/reviews_labeled.csv")
+    parser.add_argument("--keep-emojis", action="store_true", help="Do NOT strip emojis from messages")
     args = parser.parse_args()
-    main(args.input_csv, args.output_csv)
+    main(args.input_csv, args.output_csv, strip_emojis=(not args.keep_emojis))
