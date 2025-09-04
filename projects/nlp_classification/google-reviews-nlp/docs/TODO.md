@@ -18,7 +18,7 @@ It is a lightweight backlog — not a substitute for an issue tracker, but usefu
 ---
 
 ## 🧪 Testing
-- [ ] Add unit tests for `heuristics_labeling.py` (parse ratings properly)  
+- [x] Add unit tests for `heuristics_labeling.py` (parse ratings properly)  
 - [ ] Add smoke test for `SentimentClassifierTF` (train small dataset → predict)  
 - [ ] Test `SentimentClassifierHF` with different models
 
