@@ -34,11 +34,11 @@ As an aspiring **AI Engineer**, I'm building this portfolio to:
 
 Here are some of the projects I'm currently developing and showcasing in this portfolio:  
 
-### 📌 [Google Reviews NLP](https://github.com/OLeandroRodrigues/ia-portfolio/tree/main/projects/nlp_classification/google-reviews-nlp)  
-A pipeline for scraping, cleaning, and analyzing Google Reviews.  
-- 🔍 **NLP tasks**: text preprocessing, sentiment analysis, author linking  
-- ⚙️ **Stack**: Python, Selenium, pandas, scikit-learn, TensorFlow  
-- 📊 **Goal**: detect suspicious reviews and extract insights from customer feedback  
+- 📌 **[Google Reviews NLP](https://github.com/OLeandroRodrigues/ia-portfolio/tree/main/projects/nlp_classification/google-reviews-nlp)**  
+Pipeline for scraping, cleaning, and analyzing Google Reviews.  
+  - 🔍 **NLP tasks**: text preprocessing, sentiment analysis, author linking  
+  - ⚙️ **Stack**: Python, Selenium, pandas, scikit-learn, TensorFlow  
+  - 📊 **Goal**: detect suspicious reviews and extract insights from customer feedback 
   
 *(More projects will be added as the portfolio grows! 🚀)*  
 
