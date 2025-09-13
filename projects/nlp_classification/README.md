@@ -11,7 +11,7 @@ Each folder inside this repository corresponds to a **standalone project** (some
 
 ```
 nlp_classification/
-├── 
+├── google-reviews-nlp
 
 ```
 ## 🚀 How to Use
