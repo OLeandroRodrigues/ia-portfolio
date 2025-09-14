@@ -9,7 +9,7 @@ Each project has its own scope, implementation details, and dedicated README.
 
 | Project | Description | Tech Stack |
 |---------|-------------|------------|
-| 📌 [Google Reviews NLP](./google-reviews-nlp) | Pipeline for scraping, cleaning, splitting (grouped/stratified), TF-IDF baselines, and author-linking. Focused on analyzing and detecting suspicious Google reviews. | Python, Selenium, pandas, scikit-learn, PyTest, TensorFlow |
+| 📌 [Google Reviews NLP](./nlp_classification/google-reviews-nlp) | Pipeline for scraping, cleaning, splitting (grouped/stratified), TF-IDF baselines, and author-linking. Focused on analyzing and detecting suspicious Google reviews. | Python, Selenium, pandas, scikit-learn, PyTest, TensorFlow |
 
 ---
 

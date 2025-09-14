@@ -238,16 +238,7 @@ google-reviews-nlp/
 1. **Exploratory Data Analysis** (`01_eda.ipynb`)
    - Inspect raw reviews, distributions & anomalies
    - Apply basic cleaning
-
-2. **Classification** (`02_train_classifier.ipynb`)
-   - Train sentiment / topic / spam classifiers
-   - Evaluate with accuracy, F1-score & confusion matrix
-
-3. **Author Linking** (`03_linking_experiments.ipynb`)
-   - Generate embeddings + stylometry features
-   - Build similarity graph & cluster comments
-   - Identify **candidate same-author groups**
-
+   
 ---
 
 ## 📊 Outputs
